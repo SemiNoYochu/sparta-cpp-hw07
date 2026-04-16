@@ -6,10 +6,11 @@
 #include "GameFramework/Pawn.h"
 #include "Drone.generated.h"
 
+
 class UCameraComponent;
 class USpringArmComponent;
 class USkeletalMeshComponent;
-class UCapsuleComponent;
+class UBoxComponent;
 
 UCLASS()
 class SPARTACPP07_API ADrone : public APawn
@@ -25,9 +26,17 @@ protected:
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
-	UCapsuleComponent* CapsuleComponent;
+	UBoxComponent* BoxRootComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
-	USkeletalMeshComponent* SkeletalMeshComponent;
+	USkeletalMeshComponent* BodyMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	UStaticMeshComponent* WingForwardLeftMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	UStaticMeshComponent* WingForwardRightMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	UStaticMeshComponent* WingBackwardLeftMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	UStaticMeshComponent* WingBackwardRightMeshComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")

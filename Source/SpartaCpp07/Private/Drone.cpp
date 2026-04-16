@@ -5,7 +5,7 @@
 
 #include "SkeletonTreeBuilder.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 
@@ -15,20 +15,36 @@ ADrone::ADrone()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleComponent");
-	SetRootComponent(CapsuleComponent);
-	CapsuleComponent->SetSimulatePhysics(false);
+	BoxRootComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CapsuleRootComponent"));
+	SetRootComponent(BoxRootComponent);
+	BoxRootComponent->SetSimulatePhysics(false);
 	
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMeshComponent");
-	SkeletalMeshComponent->SetupAttachment(CapsuleComponent);
-	SkeletalMeshComponent->SetSimulatePhysics(false);
+	BodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMeshComponent"));
+	BodyMeshComponent->SetupAttachment(BoxRootComponent);
+	BodyMeshComponent->SetSimulatePhysics(false);
 	
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
-	SpringArmComponent->SetupAttachment(CapsuleComponent);
+	WingForwardLeftMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WingForwardLeftMeshComponent"));
+	WingForwardLeftMeshComponent->SetupAttachment(BodyMeshComponent, TEXT("ForwardLeft"));
+	WingForwardLeftMeshComponent->SetSimulatePhysics(false);
+	
+	WingForwardRightMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WingForwardRightComponent"));
+	WingForwardRightMeshComponent->SetupAttachment(BodyMeshComponent, TEXT("ForwardRight"));
+	WingForwardRightMeshComponent->SetSimulatePhysics(false);
+	
+	WingBackwardLeftMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WingBackwardLeftMeshComponent"));
+	WingBackwardLeftMeshComponent->SetupAttachment(BodyMeshComponent, TEXT("BackwardLeft"));
+	WingBackwardLeftMeshComponent->SetSimulatePhysics(false);
+	
+	WingBackwardRightMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WingBackwardRightMeshComponent"));
+	WingBackwardRightMeshComponent->SetupAttachment(BodyMeshComponent, TEXT("BackwardRight"));
+	WingBackwardRightMeshComponent->SetSimulatePhysics(false);
+	
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	SpringArmComponent->SetupAttachment(BoxRootComponent);
 	SpringArmComponent->TargetArmLength = 300.0f;
 	SpringArmComponent->bUsePawnControlRotation = true;
 	
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
 }
