@@ -3,9 +3,12 @@
 
 #include "SpartaCpp07/Public/Drone.h"
 
+#include "EnhancedInputComponent.h"
 #include "SkeletonTreeBuilder.h"
+#include "SpartaPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 
 
@@ -47,6 +50,40 @@ ADrone::ADrone()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
+	
+	FloatingPawnMovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovementComponent"));
+	FloatingPawnMovementComponent->MaxSpeed = 8000.0f;
+	FloatingPawnMovementComponent->Acceleration = 2000.0f;
+	FloatingPawnMovementComponent->Deceleration = 1000.0f;
+}
+
+void ADrone::MoveAction(const FInputActionValue& value)
+{
+	if (!Controller) return;
+	
+	const FVector MoveInput = value.Get<FVector>();
+	
+	if (!FMath::IsNearlyZero(MoveInput.X))
+	{
+		AddMovementInput(GetActorForwardVector(), MoveInput.X);
+	}
+	
+	if (!FMath::IsNearlyZero(MoveInput.Y))
+	{
+		AddMovementInput(GetActorRightVector(), MoveInput.Y);
+	}
+	
+	if (!FMath::IsNearlyZero(MoveInput.Z))
+	{
+		AddMovementInput(FVector::UpVector, MoveInput.Z);
+	}
+}
+
+void ADrone::LookAction(const FInputActionValue& value)
+{
+	const FVector2D LookInput = value.Get<FVector2D>();
+	AddControllerYawInput(LookInput.X);
+	AddControllerPitchInput(LookInput.Y);
 }
 
 // Called when the game starts or when spawned
@@ -66,5 +103,29 @@ void ADrone::Tick(float DeltaTime)
 void ADrone::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		if (ASpartaPlayerController* PlayerController = Cast<ASpartaPlayerController>(GetController()))
+		{
+			if (PlayerController->MoveInputAction)
+			{
+				EnhancedInputComponent->BindAction(
+					PlayerController->MoveInputAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ADrone::MoveAction);
+			}
+			
+			if (PlayerController->LookInputAction)
+			{
+				EnhancedInputComponent->BindAction(
+					PlayerController->LookInputAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ADrone::LookAction);
+			}
+		}
+	}
 }
 

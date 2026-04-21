@@ -7,6 +7,8 @@
 #include "Drone.generated.h"
 
 
+class UFloatingPawnMovement;
+struct FInputActionValue;
 class UCameraComponent;
 class USpringArmComponent;
 class USkeletalMeshComponent;
@@ -22,9 +24,6 @@ public:
 	ADrone();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 	UBoxComponent* BoxRootComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
@@ -41,8 +40,18 @@ protected:
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 	UCameraComponent* CameraComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	UFloatingPawnMovement* FloatingPawnMovementComponent;
+	
+	UFUNCTION()
+	void MoveAction(const FInputActionValue& value);
+	UFUNCTION()
+	void LookAction(const FInputActionValue& value);
 
 public:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
